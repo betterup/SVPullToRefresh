@@ -219,9 +219,9 @@ static char UIScrollViewPullToRefreshView;
     id customView = [self.viewForState objectAtIndex:self.state];
     BOOL hasCustomView = [customView isKindOfClass:[UIView class]];
     
-    self.titleLabel.hidden = hasCustomView;
-    self.subtitleLabel.hidden = hasCustomView;
-    self.arrow.hidden = hasCustomView;
+    self.titleLabel.hidden = YES;
+    self.subtitleLabel.hidden = YES;
+    self.arrow.hidden = YES;
     
     if(hasCustomView) {
         [self addSubview:customView];
@@ -281,14 +281,19 @@ static char UIScrollViewPullToRefreshView;
         self.subtitleLabel.text = subtitle.length > 0 ? subtitle : nil;
         
         
-        CGSize titleSize = [self.titleLabel.text sizeWithFont:self.titleLabel.font
-                                            constrainedToSize:CGSizeMake(labelMaxWidth,self.titleLabel.font.lineHeight)
-                                                lineBreakMode:self.titleLabel.lineBreakMode];
+        CGSize maximumLabelSize = CGSizeMake(labelMaxWidth,self.titleLabel.font.lineHeight);
+        CGRect textRect = [self.titleLabel.text boundingRectWithSize:maximumLabelSize
+                                                 options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
+                                              attributes:@{NSFontAttributeName: self.titleLabel.font}
+                                                 context:nil];
+        CGSize titleSize = textRect.size;
         
-        
-        CGSize subtitleSize = [self.subtitleLabel.text sizeWithFont:self.subtitleLabel.font
-                                                  constrainedToSize:CGSizeMake(labelMaxWidth,self.subtitleLabel.font.lineHeight)
-                                                      lineBreakMode:self.subtitleLabel.lineBreakMode];
+        maximumLabelSize = CGSizeMake(labelMaxWidth,self.subtitleLabel.font.lineHeight);
+        textRect = [self.subtitleLabel.text boundingRectWithSize:maximumLabelSize
+                                                             options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
+                                                          attributes:@{NSFontAttributeName: self.subtitleLabel.font}
+                                                             context:nil];
+        CGSize subtitleSize = textRect.size;
         
         CGFloat maxLabelWidth = MAX(titleSize.width,subtitleSize.width);
         
